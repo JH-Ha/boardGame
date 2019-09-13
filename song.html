@@ -35,19 +35,28 @@
     <script>
         class BoardTiles {
             constructor() {
-                this.numLeft = 4;
-                this.numTop = 4;
+                this.width = 4;
+                this.height = 4;
+                this.numEmpty = this.width * this.height;
+                this.tileArray = null;
                 this.init();
 
             }
             init() {
-                this.tileArray = Array(Array(), Array(), Array(), Array());
+                this.tileArray = Array();
+                
+
                 let i, j;
-                for (i = 0; i < this.numLeft; i++) {
-                    for (j = 0; j < this.numTop; j++) {
+                for (i =0; i< this.height; i ++){
+                    this.tileArray[i] = Array();
+                }
+                
+                for (i = 0; i < this.width; i++) {
+                    for (j = 0; j < this.height; j++) {
                         let left = 4 + 98 * i;
                         let top = 4 + 98 * j;
-                        this.tileArray[i][j] = new BoardTile(left, top);
+                        let empty = true;
+                        this.tileArray[i][j] = new BoardTile(left, top, empty, i, j);
                         this.tileArray[i][j].print();
                     }
                 }
@@ -55,8 +64,9 @@
             }
             printAll() {
                 let i, j;
-                for (i = 0; i < this.numLeft; i++) {
-                    for (j = 0; j < this.numTop; j++) {
+                console.log(`numEmpty : ${this.numEmpty}`);
+                for (i = 0; i < this.width; i++) {
+                    for (j = 0; j < this.height; j++) {
                         this.tileArray[i][j].print();
                     }
                 }
@@ -64,17 +74,45 @@
             getTile(x, y) {
                 return this.tileArray[x][y];
             }
+            moveRight() {
+                let i, j;
+                for (j = 0; j < this.height; j++) {
+                    for (i = this.width -1; i  >= 1; i--) {
+                        if(this.tileArray[i][j].empty == false && this.tileArray[i-1][j].emtpy == false){
+                            if(this.tileArray[i][j].value == this.tileArray[i-1][j].value){
+                                this.tileArray[i-1][j].empty = true;
+                                this.numEmpty ++;
+                                this.tileArray[i][j].value *=2;
+                                console.log(`add two tiles`);
+                            }
+                        }
+
+                    }
+                }
+            }
+            createTile(x,y, val){
+                this.numEmpty--;
+                this.tileArray[x][y].empty = false;
+                this.val = val;
+            }
+
         }
         class BoardTile {
-            constructor(left, top, valid) {
+            constructor(left, top, empty, x, y) {
                 this.left = left; //int
                 this.top = top; //int
+                this.empty = empty; //boolean
+                this.value = 0;
+                this.x = x;
+                this.y = y;
             }
             print() {
-                console.log(`${this.left}, ${this.top}, ${this.valid}`);
+                console.log(`${this.left}, ${this.top}, ${this.empty}, x: ${this.x}, y: ${this.y}`);
             }
         }
         var boardTiles = new BoardTiles();
+        boardTiles.createTile(1,1);
+        boardTiles.createTile(2,1);
         boardTiles.printAll();
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -86,10 +124,11 @@
                 console.log(`nextLeft ${nextLeft}`);
                 console.log(`sytle x ${$item1.getAttribute('x')}`);
 
-                console.log(`random number = ${parseInt(Math.random()*4)}`);
+                console.log(`random number = ${parseInt(Math.random() * 4)}`);
                 console.log(event.keyCode);
                 if (event.keyCode == 39) {//오른쪽 키보드
-                    var moveLeft;
+                    boardTiles.moveRight();
+                    boardTiles.printAll();
                     var player = $item1.animate([
                         { transform: 'translate(0)' },
                         { transform: `translate(98px,0px)` }
@@ -100,13 +139,13 @@
                         $item1.setAttribute('x', x + 1);
                     });
                 }
-                else if(event.keyCode == 38){//위쪽 키보드
+                else if (event.keyCode == 38) {//위쪽 키보드
 
                 }
-                else if(event.keyCode == 37){//왼쪽 키보드
+                else if (event.keyCode == 37) {//왼쪽 키보드
 
                 }
-                else if(event.keyCode == 40){//아래쪽 키보드
+                else if (event.keyCode == 40) {//아래쪽 키보드
 
                 }
             };
