@@ -91,65 +91,123 @@
                 console.log(`moveRight called`);
                 let i, j, k;
                 for (j = 0; j < this.height; j++) {
-                    for (i = this.width -1; i >=0; i--){
-                        if(this.tileArray[i][j].empty) {
+                    for (i = this.width - 1; i >= 0; i--) {
+                        if (this.tileArray[i][j].empty) {
                             continue;
                         }
                         let addTwoTile = false;
-                        for(k = i-1; k>=0; k--){
-                            if(this.tileArray[k][j].empty == true){
+                        for (k = i - 1; k >= 0; k--) {
+                            if (this.tileArray[k][j].empty == true) {
                                 continue;
                             }
-                            if(this.tileArray[k][j].value == this.tileArray[i][j].value){
+                            if (this.tileArray[k][j].value == this.tileArray[i][j].value) {
                                 addTwoTile = true;
-                                this.actionTile(i,k, j,'x-right');
+                                this.actionTile(i, k, j, 'x-right');
+                                break;
                             }
                         }
-                        if(addTwoTile == false) {
-                            this.actionOneTile(i,j,'x-right');
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'x-right');
                         }
                     }
                 }
             }
-            moveLeft(){
+            moveLeft() {
                 let i, j, k;
                 for (j = 0; j < this.height; j++) {
-                    for (i = 0; i < this.width; i++){
-                        if(this.tileArray[i][j].empty) {
+                    for (i = 0; i < this.width; i++) {
+                        if (this.tileArray[i][j].empty) {
                             continue;
                         }
                         let addTwoTile = false;
-                        for(k = i+1; k < this.width; k++){
-                            if(this.tileArray[k][j].empty == true){
+                        for (k = i + 1; k < this.width; k++) {
+                            if (this.tileArray[k][j].empty == true) {
                                 continue;
                             }
-                            if(this.tileArray[k][j].value == this.tileArray[i][j].value){
+                            if (this.tileArray[k][j].value == this.tileArray[i][j].value) {
                                 addTwoTile = true;
-                                this.actionTile(i,k, j,'x-left');
+                                this.actionTile(i, k, j, 'x-left');
+                                break;
                             }
                         }
-                        if(addTwoTile == false) {
-                            this.actionOneTile(i,j,'x-left');
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'x-left');
                         }
                     }
                 }
             }
-            actionOneTile(idx1, stdAxisIdx, direction) {
-                let tileId1 = this.makeTileId(idx1, stdAxisIdx);
+            moveTop() {
+                let i, j, k;
+                for (i = 0; i < this.width; i++) {
+                    for (j = 0; j < this.height; j++) {
+                        if (this.tileArray[i][j].empty) {
+                            continue;
+                        }
+                        let addTwoTile = false;
+                        for (k = j + 1; k < this.height; k++) {
+                            if (this.tileArray[i][k].empty == true) {
+                                continue;
+                            }
+                            if (this.tileArray[i][k].value == this.tileArray[i][j].value) {
+                                addTwoTile = true;
+                                this.actionTile(j, k, i, 'y-top');
+                                break;
+                            }
+                        }
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'y-top');
+                        }
+                    }
+                }
+            }
+            moveDown() {
+                let i, j, k;
+                for (i = 0; i < this.width; i++) {
+                    for (j = this.height - 1; j >= 0; j--) {
+                        if (this.tileArray[i][j].empty) {
+                            continue;
+                        }
+                        let addTwoTile = false;
+                        for (k = j - 1; k >= 0; k--) {
+                            if (this.tileArray[i][k].empty == true) {
+                                continue;
+                            }
+                            if (this.tileArray[i][k].value == this.tileArray[i][j].value) {
+                                addTwoTile = true;
+                                this.actionTile(j, k, i, 'y-down');
+                                break;
+                            }
+                        }
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'y-down');
+                        }
+                    }
+                }
+            }
+            actionOneTile(xStartIdx, yStartIdx, direction) {
+                let tileId1 = this.makeTileId(xStartIdx, yStartIdx);
                 var $tile1 = document.getElementById(tileId1);
                 let emptyIdx = -1;
-                let nextValue = this.tileArray[idx1][stdAxisIdx].value;
-                if (direction == 'x-right') {
-                    emptyIdx = this.findEmptyIdx('x-right', idx1, stdAxisIdx);
-                    if(emptyIdx == -1){
-                        return;
-                    }
-                    this.tileAnimate(idx1, emptyIdx, stdAxisIdx, stdAxisIdx);
-                    
+                let nextValue = this.tileArray[xStartIdx][yStartIdx].value;
+                emptyIdx = this.findEmptyIdx(direction, xStartIdx, yStartIdx);
+                if (emptyIdx == -1) {
+                    return;
+                }
+
+                if (direction == 'x-right' || direction == 'x-left') {
+                    this.tileAnimate(xStartIdx, emptyIdx, yStartIdx, yStartIdx, direction);
                     if (emptyIdx != -1) {
-                        this.tileArray[idx1][stdAxisIdx].value = 0;
-                        this.createTile(emptyIdx, stdAxisIdx, nextValue);
-                        console.log(`idx1 value !!! ${this.tileArray[idx1][stdAxisIdx].value } emptyIdx : ${emptyIdx}`);
+                        this.tileArray[xStartIdx][yStartIdx].value = 0;
+                        this.createTile(emptyIdx, yStartIdx, nextValue);
+                        console.log(`xStartIdx value !!! ${this.tileArray[xStartIdx][yStartIdx].value} emptyIdx : ${emptyIdx}`);
+                    }
+                }
+                else if (direction == 'y-top' || direction == 'y-down') {
+                    this.tileAnimate(xStartIdx, xStartIdx, yStartIdx, emptyIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[xStartIdx][yStartIdx].value = 0;
+                        this.createTile(xStartIdx, emptyIdx, nextValue);
+
                     }
                 }
 
@@ -162,43 +220,73 @@
                 this.tileArray[idx1][stdAxisIdx].empty = true;
                 //net empty tile is +1, remove 2 tiles and create 1 tile;
                 this.numEmpty++;
-                let nextValue = this.tileArray[idx1][stdAxisIdx].value *2;
+                let nextValue = this.tileArray[idx1][stdAxisIdx].value * 2;
                 //this.tileArray[idx2][stdAxisIdx].value *= 2;
-                let emptyIdx = this.findEmptyIdx(direction, idx2, stdAxisIdx);
-                if(emptyIdx == -1){
-                    if(direction == 'x-right'){
-                        emptyIdx = idx2;
-                    }
+                let emptyIdx = -1;
+                if (direction == 'x-right') {
+                    emptyIdx = this.findEmptyIdx(direction, idx2, stdAxisIdx);
                 }
-                console.log(`idx1: ${idx1}, dix2: ${idx2}, stdAxisIdx: ${stdAxisIdx} emptyIdx ${emptyIdx}`);
+                else if (direction == 'x-left') {
+                    emptyIdx = this.findEmptyIdx(direction, idx1, stdAxisIdx);
+                }
+                else if (direction == 'y-top') {
+                    emptyIdx = this.findEmptyIdx(direction, idx1, stdAxisIdx);
+                }
+                else if (direction == 'y-down') {
+                    emptyIdx = this.findEmptyIdx(direction, idx2, stdAxisIdx);
+                }
 
-                this.tileAnimate(idx1, emptyIdx, stdAxisIdx, stdAxisIdx);
-                this.tileAnimate(idx2, emptyIdx, stdAxisIdx, stdAxisIdx);
-                
+                console.log(`idx1: ${idx1}, dix2: ${idx2}, stdAxisIdx: ${stdAxisIdx} emptyIdx ${emptyIdx}`);
+                if (direction == 'x-left' || direction == 'x-right') {
+                    this.tileAnimate(idx1, emptyIdx, stdAxisIdx, stdAxisIdx, direction);
+                    this.tileAnimate(idx2, emptyIdx, stdAxisIdx, stdAxisIdx, direction);
+                }
+                else if (direction == 'y-top' || direction == 'y-down') {
+                    this.tileAnimate(stdAxisIdx, stdAxisIdx, idx1, emptyIdx, direction);
+                    this.tileAnimate(stdAxisIdx, stdAxisIdx, idx2, emptyIdx, direction);
+                }
                 if (emptyIdx != -1) {
                     this.tileArray[idx1][stdAxisIdx].value = 0;
                     this.tileArray[idx2][stdAxisIdx].value = 0;
-                    this.createTile(emptyIdx, stdAxisIdx, nextValue );
+                    this.createTile(emptyIdx, stdAxisIdx, nextValue);
                 }
             }
-            tileAnimate(xStartIdx, xEndIdx, yStartIdx, yEndIdx){
+            tileAnimate(xStartIdx, xEndIdx, yStartIdx, yEndIdx, direction) {
                 let tileId1 = this.makeTileId(xStartIdx, yStartIdx);
                 var $tile1 = document.getElementById(tileId1);
-                
-                let xPosStartTile1 = this.tileArray[xStartIdx][yStartIdx].left;
-                let xPosEndTile1 = this.tileArray[xEndIdx][yEndIdx].left;
-                let xIdxEndTile1 = this.tileArray[xEndIdx][yEndIdx].x;
 
-                let diffX1 = xPosEndTile1 - xPosStartTile1;
-                
-                var player = $tile1.animate([
-                    { transform: 'translate(0)' },
-                    { transform: `translate(${diffX1}px,0px)` }
-                ], 100);
-                player.addEventListener('finish', function () {
-                    $tile1.style.left = `${xPosEndTile1}px`;
-                    $tile1.setAttribute('x', xIdxEndTile1);
-                });
+                if (direction == 'x-left' || direction == 'x-right') {
+                    let xPosStartTile1 = this.tileArray[xStartIdx][yStartIdx].left;
+                    let xPosEndTile1 = this.tileArray[xEndIdx][yEndIdx].left;
+                    let xIdxEndTile1 = this.tileArray[xEndIdx][yEndIdx].x;
+
+                    let diffX1 = xPosEndTile1 - xPosStartTile1;
+
+                    var player = $tile1.animate([
+                        { transform: 'translate(0)' },
+                        { transform: `translate(${diffX1}px,0px)` }
+                    ], 100);
+                    player.addEventListener('finish', function () {
+                        $tile1.style.left = `${xPosEndTile1}px`;
+                        $tile1.setAttribute('x', xIdxEndTile1);
+                    });
+                }
+                else if (direction == 'y-top' || direction == 'y-down') {
+                    let yPosStartTile1 = this.tileArray[xStartIdx][yStartIdx].top;
+                    let yPosEndTile1 = this.tileArray[xEndIdx][yEndIdx].top;
+                    let yIdxEndTile1 = this.tileArray[xEndIdx][yEndIdx].y;
+
+                    let diffY1 = yPosEndTile1 - yPosStartTile1;
+
+                    var player = $tile1.animate([
+                        { transform: 'translate(0)' },
+                        { transform: `translate(0px,${diffY1}px)` }
+                    ], 100);
+                    player.addEventListener('finish', function () {
+                        $tile1.style.top = `${yPosEndTile1}px`;
+                        $tile1.setAttribute('y', yIdxEndTile1);
+                    });
+                }
 
                 var objThis = this;
                 this.tileArray[xStartIdx][yStartIdx].empty = true;
@@ -210,7 +298,7 @@
                 let i, j;
                 if (direction == 'x-right') {
                     for (i = this.width - 1; i >= 0; i--) {
-                        if (i < startX){
+                        if (i < startX) {
                             return -1;
                         }
                         if (startX == this.width - 1) {
@@ -223,11 +311,40 @@
                 }
                 else if (direction == 'x-left') {
                     for (i = 0; i < this.width; i++) {
+                        if (i > startX) {
+                            return -1;
+                        }
                         if (startX == 0) {
                             return startX;
                         }
                         if (this.tileArray[i][startY].empty == true) {
                             return i;
+                        }
+                    }
+                }
+                else if (direction == 'y-top') {
+                    for (j = 0; j < this.height; j++) {
+                        if (j > startY) {
+                            return -1;
+                        }
+                        if (startY == 0) {
+                            return startY;
+                        }
+                        if (this.tileArray[startX][j].empty == true) {
+                            return j;
+                        }
+                    }
+                }
+                else if (direction == 'y-down') {
+                    for (j = this.height - 1; j >= 0; j--) {
+                        if (j < startY) {
+                            return startY;
+                        }
+                        if (startY == this.height - 1) {
+                            return startY;
+                        }
+                        if (this.tileArray[startX][j].empty == true) {
+                            return j;
                         }
                     }
                 }
@@ -275,9 +392,9 @@
         document.addEventListener("DOMContentLoaded", function () {
             var boardTiles = new BoardTiles();
             boardTiles.createTile(0, 1, 2);
-            //boardTiles.createTile(1, 1, 2);
-            //boardTiles.createTile(2, 1, 4);
-            //boardTiles.createTile(3, 1, 4);
+            boardTiles.createTile(1, 1, 2);
+            boardTiles.createTile(2, 1, 4);
+            boardTiles.createTile(3, 1, 4);
             //boardTiles.createTile(1,2,1);
             boardTiles.printAll();
 
@@ -306,13 +423,13 @@
                     // });
                 }
                 else if (event.keyCode == 38) {//위쪽 키보드
-
+                    boardTiles.moveTop();
                 }
                 else if (event.keyCode == 37) {//왼쪽 키보드
-
+                    boardTiles.moveLeft();
                 }
                 else if (event.keyCode == 40) {//아래쪽 키보드
-
+                    boardTiles.moveDown();
                 }
             };
         });
