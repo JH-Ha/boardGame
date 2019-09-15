@@ -88,7 +88,6 @@
                 return this.tileArray[x][y];
             }
             moveRight() {
-                console.log(`moveRight called`);
                 let i, j, k;
                 for (j = 0; j < this.height; j++) {
                     for (i = this.width - 1; i >= 0; i--) {
@@ -99,6 +98,9 @@
                         for (k = i - 1; k >= 0; k--) {
                             if (this.tileArray[k][j].empty == true) {
                                 continue;
+                            }
+                            if (this.tileArray[k][j].value != this.tileArray[i][j].value){
+                                break;
                             }
                             if (this.tileArray[k][j].value == this.tileArray[i][j].value) {
                                 addTwoTile = true;
@@ -124,6 +126,9 @@
                             if (this.tileArray[k][j].empty == true) {
                                 continue;
                             }
+                            if (this.tileArray[k][j].value != this.tileArray[i][j].value){
+                                break;
+                            }
                             if (this.tileArray[k][j].value == this.tileArray[i][j].value) {
                                 addTwoTile = true;
                                 this.actionTile(i, k, j, 'x-left');
@@ -148,6 +153,9 @@
                             if (this.tileArray[i][k].empty == true) {
                                 continue;
                             }
+                            if (this.tileArray[i][k].value != this.tileArray[i][j].value) {
+                                break;
+                            }
                             if (this.tileArray[i][k].value == this.tileArray[i][j].value) {
                                 addTwoTile = true;
                                 this.actionTile(j, k, i, 'y-top');
@@ -169,8 +177,14 @@
                         }
                         let addTwoTile = false;
                         for (k = j - 1; k >= 0; k--) {
+                            if(k == 0 && j == 1 && i == 1){
+                                console.log("test");
+                            }
                             if (this.tileArray[i][k].empty == true) {
                                 continue;
+                            }
+                            if (this.tileArray[i][k].value != this.tileArray[i][j].value){
+                                break;
                             }
                             if (this.tileArray[i][k].value == this.tileArray[i][j].value) {
                                 addTwoTile = true;
@@ -199,7 +213,7 @@
                     if (emptyIdx != -1) {
                         this.tileArray[xStartIdx][yStartIdx].value = 0;
                         this.createTile(emptyIdx, yStartIdx, nextValue);
-                        console.log(`xStartIdx value !!! ${this.tileArray[xStartIdx][yStartIdx].value} emptyIdx : ${emptyIdx}`);
+                        //console.log(`xStartIdx value !!! ${this.tileArray[xStartIdx][yStartIdx].value} emptyIdx : ${emptyIdx}`);
                     }
                 }
                 else if (direction == 'y-top' || direction == 'y-down') {
@@ -217,39 +231,45 @@
             //stdAxisIdx is standard index of idx1 tile and idx2 tile
             //for example (1,3) (2,3) => idx1 = 1 idx2 = 2 stdAxisIdx = 3
             actionTile(idx1, idx2, stdAxisIdx, direction) {
-                this.tileArray[idx1][stdAxisIdx].empty = true;
-                //net empty tile is +1, remove 2 tiles and create 1 tile;
-                this.numEmpty++;
-                let nextValue = this.tileArray[idx1][stdAxisIdx].value * 2;
-                //this.tileArray[idx2][stdAxisIdx].value *= 2;
+                let nextValue = -1;
                 let emptyIdx = -1;
                 if (direction == 'x-right') {
+                    nextValue = this.tileArray[idx1][stdAxisIdx].value * 2;
                     emptyIdx = this.findEmptyIdx(direction, idx2, stdAxisIdx);
                 }
                 else if (direction == 'x-left') {
+                    nextValue = this.tileArray[idx1][stdAxisIdx].value * 2;
                     emptyIdx = this.findEmptyIdx(direction, idx1, stdAxisIdx);
                 }
                 else if (direction == 'y-top') {
-                    emptyIdx = this.findEmptyIdx(direction, idx1, stdAxisIdx);
+                    nextValue = this.tileArray[stdAxisIdx][idx1].value * 2;
+                    emptyIdx = this.findEmptyIdx(direction, stdAxisIdx, idx2);
                 }
                 else if (direction == 'y-down') {
-                    emptyIdx = this.findEmptyIdx(direction, idx2, stdAxisIdx);
+                    nextValue = this.tileArray[stdAxisIdx][idx1].value * 2;
+                    emptyIdx = this.findEmptyIdx(direction, stdAxisIdx, idx1);
                 }
 
-                console.log(`idx1: ${idx1}, dix2: ${idx2}, stdAxisIdx: ${stdAxisIdx} emptyIdx ${emptyIdx}`);
+                //console.log(`idx1: ${idx1}, dix2: ${idx2}, stdAxisIdx: ${stdAxisIdx} emptyIdx ${emptyIdx}`);
                 if (direction == 'x-left' || direction == 'x-right') {
                     this.tileAnimate(idx1, emptyIdx, stdAxisIdx, stdAxisIdx, direction);
                     this.tileAnimate(idx2, emptyIdx, stdAxisIdx, stdAxisIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[idx1][stdAxisIdx].value = 0;
+                        this.tileArray[idx2][stdAxisIdx].value = 0;
+                        this.createTile(emptyIdx, stdAxisIdx, nextValue);
+                    }
                 }
                 else if (direction == 'y-top' || direction == 'y-down') {
                     this.tileAnimate(stdAxisIdx, stdAxisIdx, idx1, emptyIdx, direction);
                     this.tileAnimate(stdAxisIdx, stdAxisIdx, idx2, emptyIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[stdAxisIdx][idx1].value = 0;
+                        this.tileArray[stdAxisIdx][idx2].value = 0;
+                        this.createTile(stdAxisIdx, emptyIdx, nextValue);
+                    }
                 }
-                if (emptyIdx != -1) {
-                    this.tileArray[idx1][stdAxisIdx].value = 0;
-                    this.tileArray[idx2][stdAxisIdx].value = 0;
-                    this.createTile(emptyIdx, stdAxisIdx, nextValue);
-                }
+
             }
             tileAnimate(xStartIdx, xEndIdx, yStartIdx, yEndIdx, direction) {
                 let tileId1 = this.makeTileId(xStartIdx, yStartIdx);
@@ -265,17 +285,19 @@
                     var player = $tile1.animate([
                         { transform: 'translate(0)' },
                         { transform: `translate(${diffX1}px,0px)` }
-                    ], 100);
+                    ], 10);
                     player.addEventListener('finish', function () {
                         $tile1.style.left = `${xPosEndTile1}px`;
                         $tile1.setAttribute('x', xIdxEndTile1);
                     });
                 }
                 else if (direction == 'y-top' || direction == 'y-down') {
+                    console.log(`before xStartIdx : ${xStartIdx}, yStartIdx : ${yStartIdx}, xEndIdx : ${xEndIdx}, yEndIdx : ${yEndIdx}`);
                     let yPosStartTile1 = this.tileArray[xStartIdx][yStartIdx].top;
                     let yPosEndTile1 = this.tileArray[xEndIdx][yEndIdx].top;
                     let yIdxEndTile1 = this.tileArray[xEndIdx][yEndIdx].y;
-
+                    console.log(`after xStartIdx : ${xStartIdx}, yStartIdx : ${yStartIdx}, xEndIdx : ${xEndIdx}, yEndIdx : ${yEndIdx}`);
+                    
                     let diffY1 = yPosEndTile1 - yPosStartTile1;
 
                     var player = $tile1.animate([
@@ -292,14 +314,14 @@
                 this.tileArray[xStartIdx][yStartIdx].empty = true;
                 setTimeout(function () {
                     objThis.removeTile(xStartIdx, yStartIdx);
-                }, 100);
+                }, 20);
             }
             findEmptyIdx(direction, startX, startY) {
                 let i, j;
                 if (direction == 'x-right') {
                     for (i = this.width - 1; i >= 0; i--) {
                         if (i < startX) {
-                            return -1;
+                            return startX;
                         }
                         if (startX == this.width - 1) {
                             return startX;
@@ -308,11 +330,12 @@
                             return i;
                         }
                     }
+                    return startX;
                 }
                 else if (direction == 'x-left') {
                     for (i = 0; i < this.width; i++) {
                         if (i > startX) {
-                            return -1;
+                            return startX;
                         }
                         if (startX == 0) {
                             return startX;
@@ -321,11 +344,12 @@
                             return i;
                         }
                     }
+                    return startX;
                 }
                 else if (direction == 'y-top') {
                     for (j = 0; j < this.height; j++) {
                         if (j > startY) {
-                            return -1;
+                            return startY;
                         }
                         if (startY == 0) {
                             return startY;
@@ -334,6 +358,7 @@
                             return j;
                         }
                     }
+                    return startY;
                 }
                 else if (direction == 'y-down') {
                     for (j = this.height - 1; j >= 0; j--) {
@@ -347,6 +372,7 @@
                             return j;
                         }
                     }
+                    return startY;
                 }
                 return -1;
             }
@@ -367,7 +393,7 @@
                 return `tile-${x}-${y}`;
             }
             removeTile(x, y) {
-                //this.tileArray[x][y].empty = true;
+                this.numEmpty++;
                 let tileId = this.makeTileId(x, y);
                 let tileList = document.getElementById('tile-list');
                 let node = document.getElementById(tileId);
@@ -391,36 +417,26 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             var boardTiles = new BoardTiles();
-            boardTiles.createTile(0, 1, 2);
-            boardTiles.createTile(1, 1, 2);
-            boardTiles.createTile(2, 1, 4);
-            boardTiles.createTile(3, 1, 4);
+            
+            let i,j;
+            for (i = 0; i< 4; i++){
+                for (j = 0; j< 4; j++){
+                    boardTiles.createTile(i,j,1);
+                }
+            }
+            //boardTiles.createTile(1, 0, 4);
+            //boardTiles.createTile(1, 1, 2);
+            //boardTiles.createTile(1, 2, 1);
+            //boardTiles.createTile(1, 3, 1);
             //boardTiles.createTile(1,2,1);
             boardTiles.printAll();
 
-
-            var $item1 = document.getElementById("item-1");
             document.onkeydown = function (event) {
-                var x = parseInt($item1.getAttribute('x'));
-                var y = parseInt($item1.getAttribute('y'));
-                let nextLeft = boardTiles.getTile(x + 1, y).left;
-                console.log(`nextLeft ${nextLeft}`);
-                console.log(`sytle x ${$item1.getAttribute('x')}`);
 
                 console.log(`random number = ${parseInt(Math.random() * 4)}`);
-                console.log(event.keyCode);
+                //console.log(event.keyCode);
                 if (event.keyCode == 39) {//오른쪽 키보드
                     boardTiles.moveRight();
-                    // boardTiles.printAll();
-                    // var player = $item1.animate([
-                    //     { transform: 'translate(0)' },
-                    //     { transform: `translate(98px,0px)` }
-                    // ]
-                    //     , 100);
-                    // player.addEventListener('finish', function () {
-                    //     $item1.style.left = `${nextLeft}px`;
-                    //     $item1.setAttribute('x', x + 1);
-                    // });
                 }
                 else if (event.keyCode == 38) {//위쪽 키보드
                     boardTiles.moveTop();
@@ -431,6 +447,28 @@
                 else if (event.keyCode == 40) {//아래쪽 키보드
                     boardTiles.moveDown();
                 }
+                setTimeout(function () {
+
+                    let randNum = parseInt(Math.random() * boardTiles.numEmpty) + 1;
+                    let i, j, cnt;
+                    cnt = 0;
+                    for (i = 0; i < boardTiles.width; i++) {
+                        for (j = 0; j < boardTiles.height; j++) {
+                            if (boardTiles.tileArray[i][j].empty== false) {
+                                continue;
+                            }
+                            cnt++;
+                            if (cnt == randNum) {
+                                boardTiles.createTile(i, j, 1);
+
+                            }
+                        }
+                    }
+                    boardTiles.printAll();
+
+
+                }, 200);
+
             };
         });
 
@@ -468,7 +506,6 @@
             </tr>
         </table>
         <div id="tile-list">
-            <div id="item-1" x="0" y="0"></div>
         </div>
     </div>
 </body>
