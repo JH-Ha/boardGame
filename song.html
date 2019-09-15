@@ -76,6 +76,12 @@
         #container{
             width : 500px;
         }
+        #complete-msg{
+            text-align: center;
+            margin-top : 30px;
+            font-size : 20px;
+            font-weight: bold;
+        }
     </style>
     <script>
         class BoardTiles {
@@ -416,6 +422,7 @@
                 let tileList = document.getElementById('tile-list');
                 let node = document.createElement('div');
                 let imgNode = document.createElement('img');
+                let $completeMsg = document.getElementById('complete-msg');
                 imgNode.width = 70;
 
                 node.style.left = 4 + x * 98;
@@ -426,29 +433,29 @@
                 let songImg = "";
                 switch(val){
                     case 1:
-                        songImg = "쌀가루.png";
+                        songImg = "img/쌀가루.png";
                         node.classList.add('tile-1');
                         break;
                     case 2:
-                        songImg = "반죽.png"
+                        songImg = "img/반죽.png"
                         node.classList.add('tile-2');
                         break;
                     case 4:
-                        songImg = "송편속.png"
+                        songImg = "img/송편속.png"
                         node.classList.add('tile-4');
                         break;
                     case 8:
-                        songImg = "송편빚음.png"
+                        songImg = "img/송편빚음.png"
                         node.classList.add('tile-8');
                         break;
                     case 16:
-                        songImg = "송편찜.png"
+                        songImg = "img/송편찜.png"
                         node.classList.add('tile-16');
                         break;
                     case 32:
-                        songImg ="완성된송편.png"
+                        songImg ="img/완성된송편.png"
                         node.classList.add('tile-32');
-                        alert("송편 완성 :D");
+                        $completeMsg.innerHTML = "완성!";
                         break;
                 }
                 imgNode.src = songImg;
@@ -516,7 +523,6 @@
                     boardTiles.moveDown();
                 }
                 setTimeout(function () {
-
                     let randNum = parseInt(Math.random() * boardTiles.numEmpty) + 1;
                     let i, j, cnt;
                     cnt = 0;
@@ -528,22 +534,25 @@
                             cnt++;
                             if (cnt == randNum) {
                                 boardTiles.createTile(i, j, 1);
-
                             }
                         }
                     }
                     boardTiles.printAll();
-
-
                 }, 200);
-
             };
         });
 
     </script>
 
 </head>
-
+<style>
+    #title{
+        font-weight: bold;
+        text-align: center;
+        font-size: 40px;
+        margin : 30px;
+    }
+</style>
 <body>
     <!-- <div id="container"> -->
     <!-- <div id ="button-container">
@@ -553,8 +562,8 @@
         <span>남은 시간 : </span>
         <span id="left-tile"></span>
     </div> -->
+    <div id="title">송편 만들기 게임</div>
     <div id="content">
-        
         <table id="board">
             <tr>
                 <td></td>
@@ -584,6 +593,7 @@
         <div id="tile-list">
         </div>
     </div>
+    <div id="complete-msg"></div>
     <!-- </div> -->
 </body>
 
