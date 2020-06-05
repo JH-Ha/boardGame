@@ -1,0 +1,600 @@
+<html>
+
+<head>
+    <style>
+        #board {
+            border: 4px solid #dddddd;
+            border-radius: 4px;
+            width: 400px;
+            height: 400px;
+            border-spacing: 0px;
+        }
+
+        #board td {
+            border: 4px solid #dddddd;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        #item-1 {
+            border-radius: 4px;
+            border: 4px solid coral;
+            width: 90px;
+            height: 90px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+        }
+
+        .tile {
+            border-radius: 4px;
+            width: 90px;
+            height: 90px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            text-align: center;
+            line-height: 90px;
+            border: 4px solid pink;
+        }
+        .tile-1{
+            border: 4px solid #948989;
+        }
+        .tile-2{
+            border: 4px solid #836464;
+        }
+        .tile-4{
+            border: 4px solid #a05c5c
+        }
+        .tile-8{
+            border: 4px solid #c03a3a
+        }
+        .tile-16{
+            border: 4px solid #c71d1d
+        }
+        .tile-32{
+            border: 4px solid #be1c1c
+        }
+
+        #content {
+            position: relative;
+            margin: auto;
+            width : 400px;
+        }
+        .btn{
+            border: 4px solid skyblue;
+            border-radius: 4px;
+            background-color: skyblue; 
+            margin : 4px;
+        }
+        #start-btn{
+            margin-left : 80px;
+        }
+        
+        #container{
+            width : 500px;
+        }
+        #complete-msg{
+            text-align: center;
+            margin-top : 30px;
+            font-size : 20px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        class BoardTiles {
+            constructor() {
+                this.width = 4;
+                this.height = 4;
+                this.numEmpty = this.width * this.height;
+                this.tileArray = null;
+                this.gameStart = false;
+                this.init();
+
+            }
+            init() {
+                this.tileArray = Array();
+
+
+                let i, j;
+                for (i = 0; i < this.height; i++) {
+                    this.tileArray[i] = Array();
+                }
+
+                for (i = 0; i < this.width; i++) {
+                    for (j = 0; j < this.height; j++) {
+                        let left = 4 + 98 * i;
+                        let top = 4 + 98 * j;
+                        let empty = true;
+                        this.tileArray[i][j] = new BoardTile(left, top, empty, i, j);
+                        this.tileArray[i][j].print();
+                    }
+                }
+
+            }
+            printAll() {
+                let i, j;
+                console.log(`numEmpty : ${this.numEmpty}`);
+                for (i = 0; i < this.width; i++) {
+                    for (j = 0; j < this.height; j++) {
+                        this.tileArray[i][j].print();
+                    }
+                }
+            }
+            getTile(x, y) {
+                return this.tileArray[x][y];
+            }
+            moveRight() {
+                let i, j, k;
+                for (j = 0; j < this.height; j++) {
+                    for (i = this.width - 1; i >= 0; i--) {
+                        if (this.tileArray[i][j].empty) {
+                            continue;
+                        }
+                        let addTwoTile = false;
+                        for (k = i - 1; k >= 0; k--) {
+                            if (this.tileArray[k][j].empty == true) {
+                                continue;
+                            }
+                            if (this.tileArray[k][j].value != this.tileArray[i][j].value){
+                                break;
+                            }
+                            if (this.tileArray[k][j].value == this.tileArray[i][j].value) {
+                                addTwoTile = true;
+                                this.actionTile(i, k, j, 'x-right');
+                                break;
+                            }
+                        }
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'x-right');
+                        }
+                    }
+                }
+            }
+            moveLeft() {
+                let i, j, k;
+                for (j = 0; j < this.height; j++) {
+                    for (i = 0; i < this.width; i++) {
+                        if (this.tileArray[i][j].empty) {
+                            continue;
+                        }
+                        let addTwoTile = false;
+                        for (k = i + 1; k < this.width; k++) {
+                            if (this.tileArray[k][j].empty == true) {
+                                continue;
+                            }
+                            if (this.tileArray[k][j].value != this.tileArray[i][j].value){
+                                break;
+                            }
+                            if (this.tileArray[k][j].value == this.tileArray[i][j].value) {
+                                addTwoTile = true;
+                                this.actionTile(i, k, j, 'x-left');
+                                break;
+                            }
+                        }
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'x-left');
+                        }
+                    }
+                }
+            }
+            moveTop() {
+                let i, j, k;
+                for (i = 0; i < this.width; i++) {
+                    for (j = 0; j < this.height; j++) {
+                        if (this.tileArray[i][j].empty) {
+                            continue;
+                        }
+                        let addTwoTile = false;
+                        for (k = j + 1; k < this.height; k++) {
+                            if (this.tileArray[i][k].empty == true) {
+                                continue;
+                            }
+                            if (this.tileArray[i][k].value != this.tileArray[i][j].value) {
+                                break;
+                            }
+                            if (this.tileArray[i][k].value == this.tileArray[i][j].value) {
+                                addTwoTile = true;
+                                this.actionTile(j, k, i, 'y-top');
+                                break;
+                            }
+                        }
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'y-top');
+                        }
+                    }
+                }
+            }
+            moveDown() {
+                let i, j, k;
+                for (i = 0; i < this.width; i++) {
+                    for (j = this.height - 1; j >= 0; j--) {
+                        if (this.tileArray[i][j].empty) {
+                            continue;
+                        }
+                        let addTwoTile = false;
+                        for (k = j - 1; k >= 0; k--) {
+                            if(k == 0 && j == 1 && i == 1){
+                                console.log("test");
+                            }
+                            if (this.tileArray[i][k].empty == true) {
+                                continue;
+                            }
+                            if (this.tileArray[i][k].value != this.tileArray[i][j].value){
+                                break;
+                            }
+                            if (this.tileArray[i][k].value == this.tileArray[i][j].value) {
+                                addTwoTile = true;
+                                this.actionTile(j, k, i, 'y-down');
+                                break;
+                            }
+                        }
+                        if (addTwoTile == false) {
+                            this.actionOneTile(i, j, 'y-down');
+                        }
+                    }
+                }
+            }
+            actionOneTile(xStartIdx, yStartIdx, direction) {
+                let tileId1 = this.makeTileId(xStartIdx, yStartIdx);
+                var $tile1 = document.getElementById(tileId1);
+                let emptyIdx = -1;
+                let nextValue = this.tileArray[xStartIdx][yStartIdx].value;
+                emptyIdx = this.findEmptyIdx(direction, xStartIdx, yStartIdx);
+                if (emptyIdx == -1) {
+                    return;
+                }
+
+                if (direction == 'x-right' || direction == 'x-left') {
+                    this.tileAnimate(xStartIdx, emptyIdx, yStartIdx, yStartIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[xStartIdx][yStartIdx].value = 0;
+                        this.createTile(emptyIdx, yStartIdx, nextValue);
+                        //console.log(`xStartIdx value !!! ${this.tileArray[xStartIdx][yStartIdx].value} emptyIdx : ${emptyIdx}`);
+                    }
+                }
+                else if (direction == 'y-top' || direction == 'y-down') {
+                    this.tileAnimate(xStartIdx, xStartIdx, yStartIdx, emptyIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[xStartIdx][yStartIdx].value = 0;
+                        this.createTile(xStartIdx, emptyIdx, nextValue);
+
+                    }
+                }
+
+
+            }
+            //idx1 first index of tile, idx2 : second idx of tile
+            //stdAxisIdx is standard index of idx1 tile and idx2 tile
+            //for example (1,3) (2,3) => idx1 = 1 idx2 = 2 stdAxisIdx = 3
+            actionTile(idx1, idx2, stdAxisIdx, direction) {
+                let nextValue = -1;
+                let emptyIdx = -1;
+                if (direction == 'x-right') {
+                    nextValue = this.tileArray[idx1][stdAxisIdx].value * 2;
+                    emptyIdx = this.findEmptyIdx(direction, idx2, stdAxisIdx);
+                }
+                else if (direction == 'x-left') {
+                    nextValue = this.tileArray[idx1][stdAxisIdx].value * 2;
+                    emptyIdx = this.findEmptyIdx(direction, idx1, stdAxisIdx);
+                }
+                else if (direction == 'y-top') {
+                    nextValue = this.tileArray[stdAxisIdx][idx1].value * 2;
+                    emptyIdx = this.findEmptyIdx(direction, stdAxisIdx, idx2);
+                }
+                else if (direction == 'y-down') {
+                    nextValue = this.tileArray[stdAxisIdx][idx1].value * 2;
+                    emptyIdx = this.findEmptyIdx(direction, stdAxisIdx, idx1);
+                }
+
+                //console.log(`idx1: ${idx1}, dix2: ${idx2}, stdAxisIdx: ${stdAxisIdx} emptyIdx ${emptyIdx}`);
+                if (direction == 'x-left' || direction == 'x-right') {
+                    this.tileAnimate(idx1, emptyIdx, stdAxisIdx, stdAxisIdx, direction);
+                    this.tileAnimate(idx2, emptyIdx, stdAxisIdx, stdAxisIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[idx1][stdAxisIdx].value = 0;
+                        this.tileArray[idx2][stdAxisIdx].value = 0;
+                        this.createTile(emptyIdx, stdAxisIdx, nextValue);
+                    }
+                }
+                else if (direction == 'y-top' || direction == 'y-down') {
+                    this.tileAnimate(stdAxisIdx, stdAxisIdx, idx1, emptyIdx, direction);
+                    this.tileAnimate(stdAxisIdx, stdAxisIdx, idx2, emptyIdx, direction);
+                    if (emptyIdx != -1) {
+                        this.tileArray[stdAxisIdx][idx1].value = 0;
+                        this.tileArray[stdAxisIdx][idx2].value = 0;
+                        this.createTile(stdAxisIdx, emptyIdx, nextValue);
+                    }
+                }
+
+            }
+            tileAnimate(xStartIdx, xEndIdx, yStartIdx, yEndIdx, direction) {
+                let tileId1 = this.makeTileId(xStartIdx, yStartIdx);
+                var $tile1 = document.getElementById(tileId1);
+
+                if (direction == 'x-left' || direction == 'x-right') {
+                    let xPosStartTile1 = this.tileArray[xStartIdx][yStartIdx].left;
+                    let xPosEndTile1 = this.tileArray[xEndIdx][yEndIdx].left;
+                    let xIdxEndTile1 = this.tileArray[xEndIdx][yEndIdx].x;
+
+                    let diffX1 = xPosEndTile1 - xPosStartTile1;
+
+                    var player = $tile1.animate([
+                        { transform: 'translate(0)' },
+                        { transform: `translate(${diffX1}px,0px)` }
+                    ], 100);
+                    player.addEventListener('finish', function () {
+                        $tile1.style.left = `${xPosEndTile1}px`;
+                        $tile1.setAttribute('x', xIdxEndTile1);
+                    });
+                }
+                else if (direction == 'y-top' || direction == 'y-down') {
+                    console.log(`before xStartIdx : ${xStartIdx}, yStartIdx : ${yStartIdx}, xEndIdx : ${xEndIdx}, yEndIdx : ${yEndIdx}`);
+                    let yPosStartTile1 = this.tileArray[xStartIdx][yStartIdx].top;
+                    let yPosEndTile1 = this.tileArray[xEndIdx][yEndIdx].top;
+                    let yIdxEndTile1 = this.tileArray[xEndIdx][yEndIdx].y;
+                    console.log(`after xStartIdx : ${xStartIdx}, yStartIdx : ${yStartIdx}, xEndIdx : ${xEndIdx}, yEndIdx : ${yEndIdx}`);
+                    
+                    let diffY1 = yPosEndTile1 - yPosStartTile1;
+
+                    var player = $tile1.animate([
+                        { transform: 'translate(0)' },
+                        { transform: `translate(0px,${diffY1}px)` }
+                    ], 100);
+                    player.addEventListener('finish', function () {
+                        $tile1.style.top = `${yPosEndTile1}px`;
+                        $tile1.setAttribute('y', yIdxEndTile1);
+                    });
+                }
+
+                var objThis = this;
+                this.tileArray[xStartIdx][yStartIdx].empty = true;
+                setTimeout(function () {
+                    objThis.removeTile(xStartIdx, yStartIdx);
+                }, 100);
+            }
+            findEmptyIdx(direction, startX, startY) {
+                let i, j;
+                if (direction == 'x-right') {
+                    for (i = this.width - 1; i >= 0; i--) {
+                        if (i < startX) {
+                            return startX;
+                        }
+                        if (startX == this.width - 1) {
+                            return startX;
+                        }
+                        if (this.tileArray[i][startY].empty == true) {
+                            return i;
+                        }
+                    }
+                    return startX;
+                }
+                else if (direction == 'x-left') {
+                    for (i = 0; i < this.width; i++) {
+                        if (i > startX) {
+                            return startX;
+                        }
+                        if (startX == 0) {
+                            return startX;
+                        }
+                        if (this.tileArray[i][startY].empty == true) {
+                            return i;
+                        }
+                    }
+                    return startX;
+                }
+                else if (direction == 'y-top') {
+                    for (j = 0; j < this.height; j++) {
+                        if (j > startY) {
+                            return startY;
+                        }
+                        if (startY == 0) {
+                            return startY;
+                        }
+                        if (this.tileArray[startX][j].empty == true) {
+                            return j;
+                        }
+                    }
+                    return startY;
+                }
+                else if (direction == 'y-down') {
+                    for (j = this.height - 1; j >= 0; j--) {
+                        if (j < startY) {
+                            return startY;
+                        }
+                        if (startY == this.height - 1) {
+                            return startY;
+                        }
+                        if (this.tileArray[startX][j].empty == true) {
+                            return j;
+                        }
+                    }
+                    return startY;
+                }
+                return -1;
+            }
+            createTile(x, y, val) {
+                this.numEmpty--;
+                this.tileArray[x][y].empty = false;
+                this.tileArray[x][y].value = val;
+                let tileList = document.getElementById('tile-list');
+                let node = document.createElement('div');
+                let imgNode = document.createElement('img');
+                let $completeMsg = document.getElementById('complete-msg');
+                imgNode.width = 70;
+
+                node.style.left = 4 + x * 98;
+                node.style.top = 4 + y * 98;
+                node.classList.add('tile');
+                node.id = this.makeTileId(x, y);
+                
+                let songImg = "";
+                switch(val){
+                    case 1:
+                        songImg = "img/쌀가루.png";
+                        node.classList.add('tile-1');
+                        break;
+                    case 2:
+                        songImg = "img/반죽.png"
+                        node.classList.add('tile-2');
+                        break;
+                    case 4:
+                        songImg = "img/송편속.png"
+                        node.classList.add('tile-4');
+                        break;
+                    case 8:
+                        songImg = "img/송편빚음.png"
+                        node.classList.add('tile-8');
+                        break;
+                    case 16:
+                        songImg = "img/송편찜.png"
+                        node.classList.add('tile-16');
+                        break;
+                    case 32:
+                        songImg ="img/완성된송편.png"
+                        node.classList.add('tile-32');
+                        $completeMsg.innerHTML = "완성!";
+                        break;
+                }
+                imgNode.src = songImg;
+                node.innerHTML = val;
+                node.appendChild(imgNode);
+                
+                tileList.appendChild(node);
+            }
+            makeTileId(x, y) {
+                return `tile-${x}-${y}`;
+            }
+            removeTile(x, y) {
+                this.numEmpty++;
+                let tileId = this.makeTileId(x, y);
+                let tileList = document.getElementById('tile-list');
+                let node = document.getElementById(tileId);
+                tileList.removeChild(node);
+            }
+
+        }
+        class BoardTile {
+            constructor(left, top, empty, x, y) {
+                this.left = left; //int
+                this.top = top; //int
+                this.empty = empty; //boolean
+                this.value = 0;
+                this.x = x;
+                this.y = y;
+            }
+            print() {
+                console.log(`${this.left}, ${this.top}, ${this.empty}, x: ${this.x}, y: ${this.y}`);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var boardTiles = new BoardTiles();
+            
+            //let i,j;
+            // for (i = 0; i< 4; i++){
+            //     for (j = 0; j< 4; j++){
+            //         boardTiles.createTile(i,j,1);
+            //     }
+            // }
+            boardTiles.createTile(1, 0, 4);
+            //boardTiles.createTile(1, 1, 2);
+            //boardTiles.createTile(1, 2, 1);
+            //boardTiles.createTile(1, 3, 1);
+            //boardTiles.createTile(1,2,1);
+            boardTiles.printAll();
+
+            document.onkeydown = function (event) {
+
+                console.log(`random number = ${parseInt(Math.random() * 4)}`);
+                //console.log(event.keyCode);
+                if (event.keyCode == 39) {//오른쪽 키보드
+                    boardTiles.moveRight();
+                }
+                else if (event.keyCode == 38) {//위쪽 키보드
+                    boardTiles.moveTop();
+                }
+                else if (event.keyCode == 37) {//왼쪽 키보드
+                    boardTiles.moveLeft();
+                }
+                else if (event.keyCode == 40) {//아래쪽 키보드
+                    boardTiles.moveDown();
+                }
+                setTimeout(function () {
+                    let randNum = parseInt(Math.random() * boardTiles.numEmpty) + 1;
+                    let i, j, cnt;
+                    cnt = 0;
+                    for (i = 0; i < boardTiles.width; i++) {
+                        for (j = 0; j < boardTiles.height; j++) {
+                            if (boardTiles.tileArray[i][j].empty== false) {
+                                continue;
+                            }
+                            cnt++;
+                            if (cnt == randNum) {
+                                boardTiles.createTile(i, j, 1);
+                            }
+                        }
+                    }
+                    boardTiles.printAll();
+                }, 200);
+            };
+        });
+
+    </script>
+
+</head>
+<style>
+    #title{
+        font-weight: bold;
+        text-align: center;
+        font-size: 40px;
+        margin : 30px;
+    }
+</style>
+<body>
+    <!-- <div id="container"> -->
+    <!-- <div id ="button-container">
+        <button id="start-btn" class="btn">start</button>
+    </div> -->
+    <!-- <div id ="time-display">
+        <span>남은 시간 : </span>
+        <span id="left-tile"></span>
+    </div> -->
+    <div id="title">송편 만들기 게임</div>
+    <div id="content">
+        <table id="board">
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <div id="tile-list">
+        </div>
+    </div>
+    <div id="complete-msg"></div>
+    <!-- </div> -->
+</body>
+
+</html>
