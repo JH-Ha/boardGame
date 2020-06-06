@@ -194,9 +194,15 @@
                     }
                 }
                 isSolved = false;
+                if(checkValidUserInput() == false){
+                    alert("해가 없습니다.!");
+                    return;
+                }
                 solve();
+                console.log(`max iter ${iterCount}`);
                 if(!isSolved){
                     alert("해가 없습니다.");
+                    
                 }
             });
             var clearBtn = document.getElementById("clear-btn");
@@ -216,10 +222,11 @@
         });
         var iterCount = 0;
         var isSolved = false;
+        var maxIter = 1000000;
         function solve() {
             iterCount ++;
             
-            if(iterCount > 1000){
+            if(iterCount > maxIter){
                 
                 return ;
             }
@@ -262,19 +269,36 @@
         //가능한 값인지 확인한다.
         function checkValid(i, j, v) {
             for (let x = 0; x < 9; x++) {
+                if(i  == x) continue;
                 if (sudoku[x][j] == v) return false;
             }
             for (let y = 0; y < 9; y++) {
+                if(j == y) continue;
                 if (sudoku[i][y] == v) return false;
             }
             let xBegin = Math.floor(i / 3) * 3;
             let yBegin = Math.floor(j / 3) * 3;
             for (let x = xBegin; x < xBegin + 3; x++) {
                 for (let y = yBegin; y < yBegin + 3; y++) {
+                    if(i == x && j == y) continue;
                     if (sudoku[x][y] == v) return false;
                 }
             }
             //console.log('true');
+            return true;
+        }
+        //valid한 input인지 확인한다.
+        function checkValidUserInput(){
+            for(let i = 0; i < 9; i ++){
+                for (let j = 0; j < 9; j ++){
+                    if(parseInt(userInput[i][j]) != 0){
+                        console.log(`${i} ${j} ${userInput[i][j]}`);
+                        if(!checkValid(i,j,userInput[i][j])){
+                            return false;
+                        }
+                    }
+                }
+            }
             return true;
         }
     </script>
