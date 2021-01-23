@@ -56,7 +56,11 @@
         let dy = [1, 0, -1, 0];
         let numRow = 5;
         let numCol = 5;
+        let numMine = 2;
         let startGame = false;
+        let endGame = false;
+        let notOpen = numRow * numCol;
+
         function clickTile() {
             console.log(this);
             let x = parseInt(this.dataset.x);
@@ -64,6 +68,7 @@
             if (!startGame) {
                 setMine(x, y);
                 startGame = true;
+                endGame = false;
             }
             open(x, y);
         }
@@ -78,6 +83,8 @@
                 return;
             }
             tileArr[x][y].isOpen = true;
+            notOpen--;
+
             let item = document.querySelector(`.item[data-x='${x}'][data-y='${y}'`);
             item.classList.add("open");
             let itemContent = item.querySelector(".item-content");
@@ -85,6 +92,10 @@
                 itemContent.textContent = "bomb";
             else {
                 itemContent.textContent = tileArr[x][y].content;
+            }
+
+            if (notOpen == numMine) {
+                alert("victory!!");
             }
             if (tileArr[x][y].num == 0) {
                 for (let nextX = x - 1; nextX <= x + 1; nextX++) {
@@ -97,7 +108,7 @@
             }
         }
         function setMine(ignoreX, ignoreY) {
-            let numMine = 5;
+
             let mineArr = [];
             for (let i = 0; i < numRow; i++) {
                 for (let j = 0; j < numCol; j++) {
