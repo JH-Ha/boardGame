@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .item {
+            font-size: 2rem;
+            flex-basis: 100%;
+            background: rgb(212, 212, 212);
+            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item:hover {
+            background: #eeeeee;
+        }
+
+        .item:active {
+            background: #bbbbbb;
+        }
+
+        .item.open {
+            background: #efefef;
+        }
+
+        .item-content {}
+
+        #board {
+            width: 500px;
+            height: 500px;
+            border: 1px solid black;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row {
+            display: flex;
+            height: 100%;
+        }
+    </style>
+    <script>
+        class Tile {
+            constructor(x, y, isOpen, isMine) {
+                this.x = x;
+                this.y = y;
+                this.isOpen = isOpen;
+                this.isMine = isMine;
+                this.priority = 0;
+            }
+        }
+        let tileArr = [];
+        let dx = [0, 1, 0, -1];
+        let dy = [1, 0, -1, 0];
+        let numRow = 5;
+        let numCol = 5;
+        let startGame = false;
+        function clickTile() {
+            console.log(this);
+            let x = parseInt(this.dataset.x);
+            let y = parseInt(this.dataset.y);
+            if (!startGame) {
+                setMine(x, y);
+                startGame = true;
+            }
+            open(x, y);
+        }
+        function isValid(x, y, n, m) {
+            if (x >= 0 && x < n && y >= 0 && y < m) {
+                return true;
+            }
+            return false;
+        }
+        function open(x, y) {
+            if (tileArr[x][y].isOpen) {
+                return;
+            }
+            tileArr[x][y].isOpen = true;
+            let item = document.querySelector(`.item[data-x='${x}'][data-y='${y}'`);
+            item.classList.add("open");
+            let itemContent = item.querySelector(".item-content");
+            if (tileArr[x][y].isMine)
+                itemContent.textContent = "bomb";
+            else {
+                itemContent.textContent = tileArr[x][y].content;
+            }
+            if (tileArr[x][y].num == 0) {
+                for (let nextX = x - 1; nextX <= x + 1; nextX++) {
+                    for (let nextY = y - 1; nextY <= y + 1; nextY++) {
+                        if (isValid(nextX, nextY, numRow, numCol) && !tileArr[nextX][nextY].isOpen) {
+                            open(nextX, nextY);
+                        }
+                    }
+                }
+            }
+        }
+        function setMine(ignoreX, ignoreY) {
+            let numMine = 5;
+            let mineArr = [];
+            for (let i = 0; i < numRow; i++) {
+                for (let j = 0; j < numCol; j++) {
+                    if (i == ignoreX && j == ignoreY) {
+                        continue;
+                    }
+                    tileArr[i][j].priority = Math.random();
+                    mineArr.push(tileArr[i][j]);
+                }
+            }
+            mineArr.sort((a, b) => {
+                return (a.priority - b.priority);
+            });
+
+            for (let i = 0; i < numMine; i++) {
+                mineArr[i].isMine = true;
+            }
+            //calculate number
+            for (let i = 0; i < numRow; i++) {
+                for (let j = 0; j < numCol; j++) {
+                    let num = 0;
+                    for (let x = i - 1; x <= i + 1; x++) {
+                        for (let y = j - 1; y <= j + 1; y++) {
+                            if (isValid(x, y, numRow, numCol) && tileArr[x][y].isMine) {
+                                num++;
+                            }
+                        }
+                    }
+                    tileArr[i][j].num = num;
+                    if (num != 0) {
+                        tileArr[i][j].content = num;
+                    }
+                }
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+
+            let board = document.getElementById("board");
+
+            for (let i = 0; i < numRow; i++) {
+                let row = document.createElement("div");
+                row.classList.add("row");
+                let tileRow = [];
+                for (let j = 0; j < numCol; j++) {
+                    let item = document.createElement("div");
+                    item.classList.add("item");
+                    item.dataset.x = i;
+                    item.dataset.y = j;
+                    item.addEventListener("click", clickTile);
+                    let itemContent = document.createElement("div");
+                    itemContent.classList.add("item-content");
+                    item.append(itemContent);
+                    row.append(item);
+                    tileRow.push(new Tile(i, j, false, false));
+                }
+                tileArr.push(tileRow);
+                board.append(row);
+            }
+
+
+        }); 
+    </script>
+</head>
+
+<body>
+    <div id="board">
+
+    </div>
+</body>
+
+</html>
