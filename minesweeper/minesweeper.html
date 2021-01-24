@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta charset="UTF-8" />
     <style>
         .item {
             font-size: 2.5rem;
@@ -50,7 +51,7 @@
             color: #7d7d7d;
         }
 
-        .item:hover {
+        .item:not(.flag):hover {
             background: #eeeeee;
         }
 
@@ -90,6 +91,53 @@
             display: flex;
             height: 100%;
         }
+
+        #modal-background {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: rgba(55, 55, 55, 0.5);
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+            z-index: -1000;
+        }
+
+        #modal-background.show {
+            display: flex;
+            z-index: 1000;
+        }
+
+        #modal {
+            flex-basis: 300px;
+            background: #d3e9ff;
+            border-radius: 5px;
+        }
+
+
+        #modal-head {
+            overflow: hidden;
+        }
+
+        #modal-close {
+            cursor: pointer;
+            margin-right: 10%;
+            float: right;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        #modal-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
     </style>
     <script>
         class Tile {
@@ -99,13 +147,14 @@
                 this.isOpen = isOpen;
                 this.isMine = isMine;
                 this.priority = 0;
+                this.isFlag = false;
             }
         }
         let tileArr = [];
         let dx = [0, 1, 0, -1];
         let dy = [1, 0, -1, 0];
-        let numRow = 5;
-        let numCol = 5;
+        let numRow = 7;
+        let numCol = 7;
         let numMine = 2;
         let startGame = false;
         let endGame = false;
@@ -120,10 +169,50 @@
             7: "seven",
             8: "eight"
         };
-        function clickTile() {
-            console.log(this);
-            let x = parseInt(this.dataset.x);
-            let y = parseInt(this.dataset.y);
+
+        function toggleFlag(x, y, item) {
+            if (tileArr[x][y].isOpen) {
+                return;
+            }
+            let itemContent = item.querySelector(".item-content");
+            if (tileArr[x][y].isFlag) {
+                tileArr[x][y].isFlag = false;
+                itemContent.innerHTML = "";
+                item.classList.remove("flag");
+            } else {
+                tileArr[x][y].isFlag = true;
+                let img = document.createElement("img");
+                img.classList.add("bomb");
+                img.src = "./flag.png";
+                itemContent.append(img);
+                item.classList.add("flag");
+            }
+
+        }
+        function clickTile(e) {
+            let isRightMB = false;
+            let item = this;
+            if ("which" in e) { // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+                isRightMB = e.which == 3;
+                for (let i = 0; i < e.path.length; i++) {
+                    if (e.path[i].classList.contains("item")) {
+                        item = e.path[i];
+                        break;
+                    }
+                }
+
+
+            }
+            let x = parseInt(item.dataset.x);
+            let y = parseInt(item.dataset.y);
+            if (isRightMB) {
+                toggleFlag(x, y, item);
+                return;
+            }
+            //To prevent start game
+            if (tileArr[x][y].isFlag) {
+                return;
+            }
             if (!startGame) {
                 setMine(x, y);
                 startGame = true;
@@ -146,7 +235,7 @@
         }
         function open(x, y) {
             //After end game, stop working of open
-            if (tileArr[x][y].isOpen) {
+            if (tileArr[x][y].isOpen || tileArr[x][y].isFlag) {
                 return;
             }
             tileArr[x][y].isOpen = true;
@@ -164,9 +253,9 @@
                     endGame = true;
                     item.classList.add("red");
                     openAll();
+                    showModal("Game Over");
                 }
-            }
-            else {
+            } else {
                 itemContent.textContent = tileArr[x][y].content;
                 if (tileArr[x][y].num != 0)
                     itemContent.classList.add(colorMap[tileArr[x][y].num]);
@@ -219,9 +308,27 @@
                 }
             }
         }
+        function showModal(content) {
+            let modalBackground = document.getElementById("modal-background");
+            let modalContent = document.getElementById("modal-content");
+            modalBackground.classList.add("show");
+            modalContent.textContent = content;
+
+        }
+        function closeModal() {
+            let modalBackground = document.getElementById("modal-background");
+            modalBackground.classList.remove("show");
+        }
         document.addEventListener("DOMContentLoaded", function () {
 
             let board = document.getElementById("board");
+
+            //disalbe showing menu when click right mouse button
+            board.oncontextmenu = function (e) {
+                console.log(e);
+                clickTile(e);
+                return false;
+            }
 
             for (let i = 0; i < numRow; i++) {
                 let row = document.createElement("div");
@@ -243,7 +350,12 @@
                 board.append(row);
             }
 
-
+            //modal setting
+            let modalClose = document.getElementById("modal-close");
+            modalClose.addEventListener("click", function () {
+                console.log("close");
+                closeModal();
+            })
         }); 
     </script>
 </head>
@@ -251,6 +363,17 @@
 <body>
     <div id="board">
 
+    </div>
+    <div id="modal-background">
+        <div id="modal">
+            <div id="modal-head">
+                <div id="modal-close">×
+                </div>
+            </div>
+            <div id="modal-content">
+                Game Over
+            </div>
+        </div>
     </div>
 </body>
 
