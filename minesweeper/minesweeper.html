@@ -4,13 +4,50 @@
 <head>
     <style>
         .item {
-            font-size: 2rem;
+            font-size: 2.5rem;
             flex-basis: 100%;
-            background: rgb(212, 212, 212);
-            border: 1px solid black;
+            background: #c1c1c1;
+            border-top: 5px solid #e6e6e6;
+            border-left: 5px solid #e6e6e6;
+            border-right: 5px solid #808080;
+            border-bottom: 5px solid #808080;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            ;
+        }
+
+        .one {
+            color: #0c0cfb;
+        }
+
+        .two {
+            color: #008000;
+        }
+
+        .three {
+            color: #f02b2b;
+        }
+
+        .four {
+            color: #000080;
+        }
+
+        .five {
+            color: #800101;
+        }
+
+        .six {
+            color: #007d7d;
+        }
+
+        .seven {
+            color: #0f0f0f;
+        }
+
+        .eight {
+            color: #7d7d7d;
         }
 
         .item:hover {
@@ -22,15 +59,24 @@
         }
 
         .item.open {
-            background: #efefef;
+            background: #c0c0c0;
+            border: 2px solid #9b9b9b;
+            padding: 3px;
         }
 
-        .item-content {}
+        .item-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bomb {
+            width: 75%;
+        }
 
         #board {
             width: 500px;
             height: 500px;
-            border: 1px solid black;
             margin: auto;
             display: flex;
             flex-direction: column;
@@ -60,7 +106,16 @@
         let startGame = false;
         let endGame = false;
         let notOpen = numRow * numCol;
-
+        let colorMap = {
+            1: "one",
+            2: "two",
+            3: "three",
+            4: "four",
+            5: "five",
+            6: "six",
+            7: "seven",
+            8: "eight"
+        };
         function clickTile() {
             console.log(this);
             let x = parseInt(this.dataset.x);
@@ -88,10 +143,17 @@
             let item = document.querySelector(`.item[data-x='${x}'][data-y='${y}'`);
             item.classList.add("open");
             let itemContent = item.querySelector(".item-content");
-            if (tileArr[x][y].isMine)
-                itemContent.textContent = "bomb";
+            if (tileArr[x][y].isMine) {
+                //itemContent.textContent = "bomb";
+                let img = document.createElement("img");
+                img.classList.add("bomb");
+                img.src = "./bomb.png";
+                itemContent.append(img);
+            }
             else {
                 itemContent.textContent = tileArr[x][y].content;
+                if (tileArr[x][y].num != 0)
+                    itemContent.classList.add(colorMap[tileArr[x][y].num]);
             }
 
             if (notOpen == numMine) {
