@@ -64,6 +64,10 @@
             padding: 3px;
         }
 
+        .item.red {
+            background: #ff0000;
+        }
+
         .item-content {
             display: flex;
             align-items: center;
@@ -133,22 +137,34 @@
             }
             return false;
         }
+        function openAll() {
+            for (let i = 0; i < numRow; i++) {
+                for (let j = 0; j < numCol; j++) {
+                    open(i, j);
+                }
+            }
+        }
         function open(x, y) {
+            //After end game, stop working of open
             if (tileArr[x][y].isOpen) {
                 return;
             }
             tileArr[x][y].isOpen = true;
-            notOpen--;
 
             let item = document.querySelector(`.item[data-x='${x}'][data-y='${y}'`);
             item.classList.add("open");
             let itemContent = item.querySelector(".item-content");
             if (tileArr[x][y].isMine) {
-                //itemContent.textContent = "bomb";
                 let img = document.createElement("img");
                 img.classList.add("bomb");
                 img.src = "./bomb.png";
                 itemContent.append(img);
+
+                if (!endGame) {
+                    endGame = true;
+                    item.classList.add("red");
+                    openAll();
+                }
             }
             else {
                 itemContent.textContent = tileArr[x][y].content;
@@ -156,9 +172,6 @@
                     itemContent.classList.add(colorMap[tileArr[x][y].num]);
             }
 
-            if (notOpen == numMine) {
-                alert("victory!!");
-            }
             if (tileArr[x][y].num == 0) {
                 for (let nextX = x - 1; nextX <= x + 1; nextX++) {
                     for (let nextY = y - 1; nextY <= y + 1; nextY++) {
