@@ -7,7 +7,8 @@
     <style>
         .item {
             font-size: 2.5rem;
-            flex-basis: 100%;
+            width: 50px;
+            height: 50px;
             background: #c1c1c1;
             border-top: 5px solid #e6e6e6;
             border-left: 5px solid #e6e6e6;
@@ -83,8 +84,8 @@
         #container {}
 
         #board {
-            width: 500px;
-            height: 500px;
+            /* width: 500px;
+            height: 500px; */
             margin: auto;
             display: flex;
             flex-direction: column;
@@ -92,7 +93,8 @@
 
         .row {
             display: flex;
-            height: 100%;
+            width: 600px;
+            justify-content: center;
         }
 
         /* for modal */
@@ -157,8 +159,8 @@
         let tileArr = [];
         let dx = [0, 1, 0, -1];
         let dy = [1, 0, -1, 0];
-        let numRow = 7;
-        let numCol = 7;
+        let numRow = 5;
+        let numCol = 9;
         let numMine = 2;
         let isStarted = false;
         let isEnded = false;
