@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="kr">
 
 <head>
     <meta charset="UTF-8" />
+    <title>minesweeper</title>
     <style>
         .item {
             font-size: 2.5rem;
@@ -233,6 +234,19 @@
                 }
             }
         }
+        function getItem(i, j) {
+            return document.querySelector(`.item[data-x='${i}'][data-y='${j}']`);
+        }
+        function flagAll() {
+            for (let i = 0; i < numRow; i++) {
+                for (let j = 0; j < numCol; j++) {
+                    if (!tileArr[i][j].isOpen && !tileArr[i][j].isFlag) {
+                        let item = getItem(i, j);
+                        toggleFlag(i, j, item);
+                    }
+                }
+            }
+        }
         function open(x, y) {
             //After end game, stop working of open
             if (tileArr[x][y].isOpen || tileArr[x][y].isFlag) {
@@ -261,6 +275,22 @@
                     itemContent.classList.add(colorMap[tileArr[x][y].num]);
             }
 
+            //check victory
+
+            if (!endGame) {
+                let leftOpen = 0;
+                for (let i = 0; i < numRow; i++) {
+                    for (let j = 0; j < numCol; j++) {
+                        if (!tileArr[i][j].isOpen) {
+                            leftOpen++;
+                        }
+                    }
+                }
+                if (leftOpen == numMine) {
+                    showModal("Victory");
+                    flagAll();
+                }
+            }
             if (tileArr[x][y].num == 0) {
                 for (let nextX = x - 1; nextX <= x + 1; nextX++) {
                     for (let nextY = y - 1; nextY <= y + 1; nextY++) {
