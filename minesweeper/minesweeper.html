@@ -18,7 +18,15 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            ;
+        }
+
+        @media screen and (min-width : 900px) {
+            .item {
+                font-size: 3.5rem;
+                width: 70px;
+                height: 70px;
+            }
+
         }
 
         .one {
@@ -93,8 +101,8 @@
 
         .row {
             display: flex;
-            width: 600px;
             justify-content: center;
+            margin: auto;
         }
 
         /* for modal */
@@ -144,6 +152,25 @@
             font-size: 2.5rem;
             font-weight: bold;
         }
+
+        #top-bar {
+            width: 50%;
+            margin: 10px auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #reset-btn {
+            font-size: 4rem;
+        }
+
+        #left-mine {
+            font-size: 4rem;
+        }
+
+        #time {
+            font-size: 4rem;
+        }
     </style>
     <script>
         class Tile {
@@ -159,9 +186,9 @@
         let tileArr = [];
         let dx = [0, 1, 0, -1];
         let dy = [1, 0, -1, 0];
-        let numRow = 5;
-        let numCol = 9;
-        let numMine = 2;
+        let numRow = 10;
+        let numCol = 8;
+        let numMine = 10;
         let isStarted = false;
         let isEnded = false;
         let notOpen = numRow * numCol;
@@ -175,7 +202,17 @@
             7: "seven",
             8: "eight"
         };
+        let startTime = 0;
+        let intervalId = -1;
+        let leftMine = numMine;
 
+        function toStringLeadingZero(num, targetLength) {
+            let str = num + '';
+            while (str.length < targetLength) {
+                str = '0' + str;
+            }
+            return str;
+        }
         function toggleFlag(x, y, item) {
             if (tileArr[x][y].isOpen) {
                 return;
@@ -185,6 +222,7 @@
                 tileArr[x][y].isFlag = false;
                 itemContent.innerHTML = "";
                 item.classList.remove("flag");
+                leftMine++;
             } else {
                 tileArr[x][y].isFlag = true;
                 let img = document.createElement("img");
@@ -192,8 +230,9 @@
                 img.src = "./flag.png";
                 itemContent.append(img);
                 item.classList.add("flag");
+                leftMine--;
             }
-
+            setContext('left-mine', toStringLeadingZero(leftMine, 3));
         }
         function clickTile(e) {
             let isRightMB = false;
@@ -223,6 +262,20 @@
                 setMine(x, y);
                 isStarted = true;
                 isEnded = false;
+                startTime = new Date();
+                setContext('time', '000');
+
+                intervalId = setInterval(() => {
+                    let curTime = new Date();
+                    let timeDiff = Math.floor((curTime - startTime) / 1000) + '';
+                    while (timeDiff.length < 3) {
+                        timeDiff = '0' + timeDiff;
+                    }
+                    setContext('time', timeDiff);
+                    if (isEnded) {
+                        clearInterval(intervalId);
+                    }
+                }, 100);
             }
             open(x, y);
         }
@@ -294,6 +347,7 @@
                 if (leftOpen == numMine) {
                     showModal("Victory");
                     flagAll();
+                    isEnded = true;
                 }
             }
             if (tileArr[x][y].num == 0) {
@@ -416,9 +470,9 @@
 <body>
     <div id="container">
         <div id="top-bar">
-            <div id="left-mine"></div>
+            <div id="left-mine">000</div>
             <button id="reset-btn">reset</button>
-            <div id="time"></div>
+            <div id="time">000</div>
         </div>
         <div id="board">
 
