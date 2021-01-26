@@ -113,8 +113,7 @@
             background: rgba(55, 55, 55, 0.5);
             top: 0;
             left: 0;
-            display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             display: none;
             z-index: -1000;
@@ -129,6 +128,7 @@
             flex-basis: 300px;
             background: #d3e9ff;
             border-radius: 5px;
+            margin-top: 20%;
         }
 
 
@@ -158,18 +158,25 @@
             margin: 10px auto;
             display: flex;
             justify-content: space-between;
+            font-size: 0.7rem;
+        }
+
+        @media screen and (min-width: 900px) {
+            #top-bar {
+                font-size: 1rem;
+            }
         }
 
         #reset-btn {
-            font-size: 4rem;
+            font-size: 4em;
         }
 
         #left-mine {
-            font-size: 4rem;
+            font-size: 4em;
         }
 
         #time {
-            font-size: 4rem;
+            font-size: 4em;
         }
     </style>
     <script>
@@ -416,12 +423,17 @@
         }
         function resetGame() {
             initGame();
+            clearInterval(intervalId);
         }
         function initGame() {
             let board = document.getElementById("board");
             board.innerHTML = "";
             tileArr = [];
             isStarted = false;
+            isEnded = false;
+            setContext('left-mine', toStringLeadingZero(numMine, 3));
+            setContext('time', '000');
+            leftMine = numMine;
             //disalbe showing menu when click right mouse button
             board.oncontextmenu = function (e) {
                 console.log(e);
