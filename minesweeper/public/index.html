@@ -266,6 +266,8 @@
                 clickTile(e);
                 return false;
             }
+            let rowContainer = document.createElement("div");
+            rowContainer.classList.add("row-container");
 
             for (let i = 0; i < numRow; i++) {
                 let row = document.createElement("div");
@@ -284,8 +286,9 @@
                     tileRow.push(new Tile(i, j, false, false));
                 }
                 tileArr.push(tileRow);
-                board.append(row);
+                rowContainer.append(row);
             }
+            board.append(rowContainer);
 
             //modal setting
             let modalClose = document.getElementById("modal-close");
