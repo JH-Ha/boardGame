@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>minesweeper</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
     <script>
         class Tile {
@@ -305,6 +307,10 @@
             resetBtn.addEventListener("click", () => {
                 resetGame();
             });
+            resetBtn.addEventListener("mousedown", () => {
+
+            });
+
         }); 
     </script>
 </head>
@@ -314,7 +320,10 @@
         <div id="title">Minesweeper</div>
         <div id="top-bar">
             <div id="left-mine">000</div>
-            <button id="reset-btn">reset</button>
+            <button id="reset-btn">
+                <img class="img-face" src="face.png" alt="reset game">
+                <img class="img-face-down display-none" src="face-down.png" alt="clicked face">
+            </button>
             <div id="time">000</div>
         </div>
         <div id="board">
