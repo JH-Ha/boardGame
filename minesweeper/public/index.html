@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
+    <script src="https://use.fontawesome.com/releases/v5.15.2/js/all.js" data-auto-a11y="true"></script>
     <script>
         class Tile {
             constructor(x, y, isOpen, isMine) {
@@ -19,14 +20,21 @@
                 this.isFlag = false;
             }
         }
+        class Record {
+            constructor(date, time) {
+                this.date = date;
+                this.time = time;
+            }
+        }
         let tileArr = [];
         let dx = [0, 1, 0, -1];
         let dy = [1, 0, -1, 0];
         let numRow = 9;
         let numCol = 9;
-        let numMine = 10;
+        let numMine = 1;
         let isStarted = false;
         let isEnded = false;
+        let clickMode = "bomb";
         let notOpen = numRow * numCol;
         let colorMap = {
             1: "one",
@@ -43,9 +51,18 @@
         let leftMine = numMine;
 
         function toStringLeadingZero(num, targetLength) {
+            let isMinus = false;
+            if (num < 0) {
+                isMinus = true;
+                num = -num;
+                targetLength--;
+            }
             let str = num + '';
             while (str.length < targetLength) {
                 str = '0' + str;
+            }
+            if (isMinus) {
+                str = '-' + str;
             }
             return str;
         }
@@ -81,8 +98,11 @@
                         break;
                     }
                 }
+            }
 
-
+            //flag mode
+            if (clickMode == "flag") {
+                isRightMB = true;
             }
             let x = parseInt(item.dataset.x);
             let y = parseInt(item.dataset.y);
@@ -141,6 +161,20 @@
                 }
             }
         }
+
+        function changeFace(mode) {
+            if (mode == "smile") {
+                let imgFaceSurprising = document.querySelector(".face-surprising");
+                imgFaceSurprising.classList.add("display-none");
+                let imgFaceSmile = document.querySelector(".face-smile");
+                imgFaceSmile.classList.remove("display-none");
+            } else if (mode == "default") {
+                let imgFaceSurprising = document.querySelector(".face-surprising");
+                imgFaceSurprising.classList.remove("display-none");
+                let imgFaceSmile = document.querySelector(".face-smile");
+                imgFaceSmile.classList.add("display-none");
+            }
+        }
         function open(x, y) {
             //After end game, stop working of open
             if (tileArr[x][y].isOpen || tileArr[x][y].isFlag) {
@@ -182,8 +216,22 @@
                 }
                 if (leftOpen == numMine) {
                     showModal("Victory");
+
+                    //save the record
+                    let record = [];
+                    if (localStorage.getItem("minesweeperRecord") != undefined) {
+                        record = JSON.parse(localStorage.getItem("minesweeperRecord"));
+                    }
+                    let curTime = new Date();
+                    let recordTime = Math.floor((curTime - startTime) / 10) / 100;
+                    record.push(new Record(new Date(), recordTime));
+                    localStorage.setItem("minesweeperRecord", JSON.stringify(record));
                     flagAll();
                     isEnded = true;
+
+                    //change face
+                    changeFace("smile");
+
                 }
             }
             if (tileArr[x][y].num == 0) {
@@ -239,13 +287,19 @@
                 node.textContent = context
             }
         }
-        function showModal(content) {
+        function showModal(content, title) {
+            if (title == undefined)
+                title = "";
             let modalBackground = document.getElementById("modal-background");
             let modalContent = document.getElementById("modal-content");
+            let modalHeadContent = document.getElementById("modal-head-content");
+
             modalBackground.classList.add("show");
             modalContent.textContent = content;
+            modalHeadContent.textContent = title;
 
         }
+
         function closeModal() {
             let modalBackground = document.getElementById("modal-background");
             modalBackground.classList.remove("show");
@@ -260,8 +314,11 @@
             tileArr = [];
             isStarted = false;
             isEnded = false;
+            //clickMode = "bomb";
+
             setContext('left-mine', toStringLeadingZero(numMine, 3));
             setContext('time', '000');
+            changeFace("default");
             leftMine = numMine;
             //disalbe showing menu when click right mouse button
             board.oncontextmenu = function (e) {
@@ -311,6 +368,20 @@
 
             });
 
+            let $clickModeBtn = document.getElementById("click-mode");
+            $clickModeBtn.addEventListener("click", function () {
+                let $bombImg = $clickModeBtn.querySelector(".click-bomb");
+                let $flagImg = $clickModeBtn.querySelector(".click-flag");
+                if (clickMode == "bomb") {
+                    $bombImg.classList.add("display-none");
+                    $flagImg.classList.remove("display-none");
+                    clickMode = "flag";
+                } else if (clickMode == "flag") {
+                    $bombImg.classList.remove("display-none");
+                    $flagImg.classList.add("display-none");
+                    clickMode = "bomb";
+                }
+            });
         }); 
     </script>
 </head>
@@ -318,12 +389,22 @@
 <body>
     <div id="container">
         <div id="top-bar">
-            <div id="left-mine">000</div>
-            <button id="reset-btn">
-                <img class="img-face" src="face.png" alt="reset game">
-                <img class="img-face-down display-none" src="face-down.png" alt="clicked face">
-            </button>
-            <div id="time">000</div>
+            <div class="top-btn" id="">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="game-info">
+                <div id="left-mine">000</div>
+                <button id="reset-btn" class="top-btn">
+                    <img class="img-face face-surprising" src="face-surprising.png" alt="reset game">
+                    <img class="img-face face-calm display-none" src="face-calm.png" alt="clicked face">
+                    <img class="img-face face-smile display-none" src="face-smile.png" alt="victory face">
+                </button>
+                <div id="time">000</div>
+            </div>
+            <div class="top-btn" id="click-mode">
+                <img src="bomb.png" class="click-bomb" alt="click mode">
+                <img src="flag.png" class="click-flag display-none" alt="click mode">
+            </div>
         </div>
         <div id="board">
 
@@ -332,11 +413,11 @@
     <div id="modal-background">
         <div id="modal">
             <div id="modal-head">
+                <div id="modal-head-content"></div>
                 <div id="modal-close">×
                 </div>
             </div>
             <div id="modal-content">
-                Game Over
             </div>
         </div>
     </div>

@@ -31,6 +31,9 @@ body{
     width : 100%;
     margin: 0;
 }
+img {
+    width : 100%;
+}
 
 .item {
     font-size: var(--font-size-xlarge);
@@ -46,6 +49,8 @@ body{
     
     width: 100%;
     height : 100%;
+
+    position: relative;
 }
 
 @media screen and (max-width: 768px) {
@@ -55,12 +60,12 @@ body{
 }
 @media screen and (max-width: 480px) {
     .item {
-        font-size: var(--font-size-medium);
+        font-size: var(--font-size-xlarge);
     }
 }
 @media screen and (max-width: 320px) {
     .item {
-        font-size: var(--font-size-small);
+        font-size: var(--font-size-large);
     }
 }
 .one {
@@ -117,6 +122,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    position : absolute;
 }
 
 .bomb {
@@ -199,7 +205,7 @@ body{
 
 #modal {
     flex-basis: 300px;
-    background: #d3e9ff;
+    background: #ededed;
     border-radius: 5px;
     margin-top: 20%;
 }
@@ -207,6 +213,9 @@ body{
 
 #modal-head {
     overflow: hidden;
+    background: #bbbbbb;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 }
 
 #modal-close {
@@ -236,7 +245,7 @@ body{
     margin: auto;
     margin-bottom : 10px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     font-size: var(--font-size-xlarge);
     font-family: 'Roboto Mono', monospace;
     background-color: var(--color-gray);
@@ -253,11 +262,14 @@ body{
         font-size: var(--font-size-xlarge);
     }
 }
-#reset-btn{
+
+.top-btn{
     width : 50px;
     height : 50px;
     padding : 5px;    
     display : flex;
+    justify-content: center;
+    align-items: center;
     border : 2px solid var(--color-dark-gray);
     background-color: var(--color-gray);
     border-top : 5px solid var(--color-light-gray);
@@ -267,11 +279,12 @@ body{
     margin : 0 var(--margin);
 }
 
-#reset-btn:hover{
-    background: #eeeeee;;
+
+.top-btn:hover{
+    background: #cdcdcd;;
 }
 
-#reset-btn:active{
+.top-btn:active{
     background-color: var(--color-clicked-gray);
     border : 5px solid var(--color-clicked-border);
 }
@@ -279,14 +292,12 @@ body{
 #reset-btn:active .img-face{
     display : none;
 }
-#reset-btn:active .img-face-down{
+
+#reset-btn:active .face-calm{
     display : block;
 }
 
 .img-face{
-    width : 100%;
-}
-.img-face-down{
     width : 100%;
 }
 
@@ -301,4 +312,8 @@ body{
     color : #fa0300;
     width : 60px;
     justify-content: center;
+}
+
+.game-info{
+    display: flex;
 }
