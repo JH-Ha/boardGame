@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="style.css" />
     <script src="https://use.fontawesome.com/releases/v5.15.2/js/all.js" data-auto-a11y="true"></script>
     <script>
+        const MINESWEEPER_RECORD = "minesweeperRecord";
+
         class Tile {
             constructor(x, y, isOpen, isMine) {
                 this.x = x;
@@ -31,7 +33,7 @@
         let dy = [1, 0, -1, 0];
         let numRow = 9;
         let numCol = 9;
-        let numMine = 1;
+        let numMine = 10;
         let isStarted = false;
         let isEnded = false;
         let clickMode = "bomb";
@@ -195,7 +197,9 @@
                     isEnded = true;
                     item.classList.add("red");
                     openAll();
-                    showModal("Game Over");
+                    let msg = document.createElement("div");
+                    msg.textContent = "Game Over";
+                    showModal(msg);
                 }
             } else {
                 itemContent.textContent = tileArr[x][y].content;
@@ -215,17 +219,19 @@
                     }
                 }
                 if (leftOpen == numMine) {
-                    showModal("Victory");
+                    let msg = document.createElement("div");
+                    msg.textContent = "Victory";
+                    showModal(msg);
 
                     //save the record
                     let record = [];
-                    if (localStorage.getItem("minesweeperRecord") != undefined) {
-                        record = JSON.parse(localStorage.getItem("minesweeperRecord"));
+                    if (localStorage.getItem(MINESWEEPER_RECORD) != undefined) {
+                        record = JSON.parse(localStorage.getItem(MINESWEEPER_RECORD));
                     }
                     let curTime = new Date();
                     let recordTime = Math.floor((curTime - startTime) / 10) / 100;
                     record.push(new Record(new Date(), recordTime));
-                    localStorage.setItem("minesweeperRecord", JSON.stringify(record));
+                    localStorage.setItem(MINESWEEPER_RECORD, JSON.stringify(record));
                     flagAll();
                     isEnded = true;
 
@@ -287,7 +293,7 @@
                 node.textContent = context
             }
         }
-        function showModal(content, title) {
+        function showModal(contentElement, title) {
             if (title == undefined)
                 title = "";
             let modalBackground = document.getElementById("modal-background");
@@ -295,7 +301,8 @@
             let modalHeadContent = document.getElementById("modal-head-content");
 
             modalBackground.classList.add("show");
-            modalContent.textContent = content;
+            modalContent.innerHTML = "";
+            modalContent.append(contentElement);
             modalHeadContent.textContent = title;
 
         }
@@ -364,9 +371,6 @@
             resetBtn.addEventListener("click", () => {
                 resetGame();
             });
-            resetBtn.addEventListener("mousedown", () => {
-
-            });
 
             let $clickModeBtn = document.getElementById("click-mode");
             $clickModeBtn.addEventListener("click", function () {
@@ -382,6 +386,53 @@
                     clickMode = "bomb";
                 }
             });
+
+            //show records
+            let $recordBtn = document.getElementById("record-btn");
+            $recordBtn.addEventListener("click", () => {
+                let record = localStorage.getItem(MINESWEEPER_RECORD);
+                if (record != undefined) {
+                    record = JSON.parse(record);
+                } else {
+                    record = [];
+                }
+                record.sort((a, b) => {
+                    return a.time - b.time;
+                });
+                let table = document.getElementById("record-table").cloneNode(true);
+                table.classList.remove("display-none");
+                let tbody = table.querySelector("tbody");
+                tbody.innerHTML = "";
+                //show max 10 records
+                for (let i = 0; i < 10 && i < record.length; i++) {
+                    let r = record[i];
+                    let tr = document.createElement("tr");
+                    let tdIdx = document.createElement("td");
+                    let tdDate = document.createElement("td");
+                    let tdTime = document.createElement("td");
+
+                    //to change locale date
+                    let recordDate = new Date(r.date);
+
+                    let year = recordDate.getFullYear();
+                    let month = toStringLeadingZero(recordDate.getMonth() + 1, 2);
+                    let date = toStringLeadingZero(recordDate.getDate(), 2);
+                    let hour = toStringLeadingZero(recordDate.getHours(), 2);
+                    let minute = toStringLeadingZero(recordDate.getMinutes(), 2);
+                    let second = toStringLeadingZero(recordDate.getSeconds(), 2);
+                    tdIdx.textContent = i + 1;
+                    tdDate.textContent = `${year}.${month}.${date} ${hour}:${minute}:${second}`;
+                    //r.date.substr(0, r.date.length - 5);
+                    tdTime.textContent = r.time;
+
+                    tr.append(tdIdx);
+                    tr.append(tdDate);
+                    tr.append(tdTime);
+
+                    tbody.append(tr);
+                }
+                showModal(table, "Record");
+            });
         }); 
     </script>
 </head>
@@ -389,7 +440,7 @@
 <body>
     <div id="container">
         <div id="top-bar">
-            <div class="top-btn" id="">
+            <div class="top-btn" id="record-btn">
                 <i class="fas fa-bars"></i>
             </div>
             <div class="game-info">
@@ -421,6 +472,19 @@
             </div>
         </div>
     </div>
+
+    <table id="record-table" class="display-none">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Date</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
 </body>
 
 </html>
