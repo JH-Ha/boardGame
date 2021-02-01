@@ -48,7 +48,7 @@ img {
     justify-content: center;
     font-weight: bold;
     width: 100%;
-    height: 100%;
+    height: 100% !important;
     position: relative;
 }
 
@@ -163,7 +163,7 @@ img {
     position: absolute;
     top: 0;
     width: 100%;
-    height: 100%;
+    height: 100% !important;
     display: flex;
     flex-direction: column;
 }
@@ -182,7 +182,19 @@ img {
     justify-content: center;
     margin: auto;
     width: 100%;
-    height: 100%;
+    height: 100% !important;
+}
+
+.item .item-content img{
+    margin : 0;
+}
+
+#reset-btn img{
+    margin : 0;
+}
+
+#click-mode img{
+    margin : 0;
 }
 
 /* for modal */
@@ -312,7 +324,7 @@ img {
 }
 
 .display-none {
-    display: none;
+    display: none !important;
 }
 
 #left-mine, #time {
