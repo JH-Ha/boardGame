@@ -176,6 +176,11 @@
                         let leftY = y - 1 < 0 ? 0 : y - 1;
                         let rightY = y + 1 > 8 ? 8 : y + 1;
                         let nextX = x, nextY = y;
+                        if (keyCode >= 37 && keyCode <= 40) {
+                            // number up down
+                            e.preventDefault();
+                        }
+
                         switch (keyCode) {
                             //left
                             case 37: {
@@ -201,9 +206,15 @@
                         let nextInput = document.getElementById(`${nextX}-${nextY}`);
                         nextInput.focus();
                     }
+                    let onInputHandler = (e) => {
+                        if (e.data >= 1 && e.data <= 9) {
+                            e.target.value = e.data;
+                        }
+                    }
 
                     cell.onchange = userInputHandler;
                     cell.onkeydown = keydownHandler;
+                    cell.oninput = onInputHandler;
 
                     cell.id = `${i}-${j}`;
                     row.append(cell);
