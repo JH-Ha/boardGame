@@ -232,13 +232,13 @@
                 }
                 isSolved = false;
                 if (checkValidUserInput() == false) {
-                    alert("해가 없습니다.!");
+                    alert("No solution !");
                     return;
                 }
                 solve();
                 console.log(`max iter ${iterCount}`);
                 if (!isSolved) {
-                    alert("해가 없습니다.");
+                    alert("No solution. ");
 
                 }
             });
