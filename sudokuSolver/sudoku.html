@@ -6,68 +6,92 @@
             display: flex;
             justify-content: center;
         }
-        .cell{
-            width : 50px !important;
-            height : 50px !important;
+
+        .cell {
+            width: 50px !important;
+            height: 50px !important;
         }
-        button{
-            border-radius : 5px;
+
+        button {
+            border-radius: 5px;
         }
-        #solve-btn{
+
+        #solve-btn {
             background: #2e419e;
             color: white;
             border: 3px solid#1b1e67;
         }
-        #clear-btn{
-            background : #eeeeee;
-            border : 3px solid gray;
+
+        #clear-btn {
+            background: #eeeeee;
+            border: 3px solid gray;
         }
-        
-        @media (min-width : 300px) and (max-width : 500px){
-            .cell{
-                width : 30px !important;
-                height : 30px !important;
-                font-size : 1rem !important;
+
+        @media (min-width : 300px) and (max-width : 500px) {
+            .cell {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 1rem !important;
             }
+
             button {
-                font-size : 1rem;
+                font-size: 1rem;
             }
         }
-        @media (min-width : 500px) and (max-width : 800px){
-            .cell{
-                width : 50px !important;
-                height : 50px !important;
-                font-size : 2rem!important;
+
+        @media (min-width : 500px) and (max-width : 800px) {
+            .cell {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.5rem !important;
             }
+
             button {
-                font-size : 2rem;
+                font-size: 1.5rem;
             }
         }
-        @media (min-width : 700px){
-            .cell{
-                width : 70px !important;
-                height : 70px !important;
-                font-size : 3rem!important;
+
+        @media (min-width : 700px) {
+            .cell {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 2rem !important;
             }
+
             button {
-                font-size : 3rem;
+                font-size: 2rem;
             }
         }
-        
+
         .cell {
-            
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1px solid gray;
             text-align: center;
+            -webkit-appearance: none;
         }
-        
-        #title{
+
+        /* remove spinner in number type input */
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+
+        }
+
+
+        #title {
             display: flex;
             justify-content: center;
-            font-size : 3rem;
-            padding : 10px;
+            font-size: 3rem;
+            padding: 10px;
         }
 
         .user-input {
@@ -94,13 +118,14 @@
             display: flex;
             justify-content: center;
         }
-        .button-container button{
-            margin : 30px;
-            padding : 10px;
+
+        .button-container button {
+            margin: 30px;
+            padding: 10px;
         }
     </style>
     <script>
-        
+
         //make empty sudoku
         var sudoku = [];
         var userInput = [];
@@ -122,6 +147,7 @@
                 row.classList.add('row');
                 for (let j = 0; j < 9; j++) {
                     let cell = document.createElement("input");
+                    cell.type = 'number';
                     cell.contentEditable = true;
                     cell.classList.add("cell");
                     cell.maxLength = 1;
@@ -131,7 +157,7 @@
                     let userInputHandler = (e) => {
                         let x = cell.dataset.x;
                         let y = cell.dataset.y;
-                        
+
                         if (cell.value === "") {
                             userInput[x][y] = 0;
                             cell.classList.remove("user-input");
@@ -140,34 +166,34 @@
                         userInput[x][y] = parseInt(cell.value);
                         cell.classList.add("user-input");
                     };
-                    let keydownHandler = (e) =>{
+                    let keydownHandler = (e) => {
                         let keyCode = e.keyCode;
                         let key = e.key;
                         let x = parseInt(cell.dataset.x);
                         let y = parseInt(cell.dataset.y);
-                        let upX = x - 1 < 0 ? 0 : x -1;
+                        let upX = x - 1 < 0 ? 0 : x - 1;
                         let downX = x + 1 > 8 ? 8 : x + 1;
-                        let leftY = y - 1 < 0 ? 0 : y -1;
-                        let rightY = y + 1 > 8 ? 8: y + 1;
+                        let leftY = y - 1 < 0 ? 0 : y - 1;
+                        let rightY = y + 1 > 8 ? 8 : y + 1;
                         let nextX = x, nextY = y;
-                        switch(keyCode){
+                        switch (keyCode) {
                             //left
-                            case 37 : {
+                            case 37: {
                                 nextY = leftY;
                                 break;
                             }
                             //up
-                            case 38 :{
+                            case 38: {
                                 nextX = upX;
                                 break;
                             }
                             //right
-                            case 39 : {
+                            case 39: {
                                 nextY = rightY;
                                 break;
                             }
                             //down
-                            case 40 : {
+                            case 40: {
                                 nextX = downX;
                                 break;
                             }
@@ -194,15 +220,15 @@
                     }
                 }
                 isSolved = false;
-                if(checkValidUserInput() == false){
+                if (checkValidUserInput() == false) {
                     alert("해가 없습니다.!");
                     return;
                 }
                 solve();
                 console.log(`max iter ${iterCount}`);
-                if(!isSolved){
+                if (!isSolved) {
                     alert("해가 없습니다.");
-                    
+
                 }
             });
             var clearBtn = document.getElementById("clear-btn");
@@ -224,18 +250,18 @@
         var isSolved = false;
         var maxIter = 1000000;
         function solve() {
-            iterCount ++;
-            
-            if(iterCount > maxIter){
-                
-                return ;
+            iterCount++;
+
+            if (iterCount > maxIter) {
+
+                return;
             }
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
                     //sudoku 에 채울 값
                     if (sudoku[i][j] == 0) {
                         let randomOrderArr = [];
-                        for(let v = 1; v <=9; v++){
+                        for (let v = 1; v <= 9; v++) {
                             randomOrderArr.push([Math.random(), v]);
                         }
                         randomOrderArr.sort();
@@ -269,18 +295,18 @@
         //가능한 값인지 확인한다.
         function checkValid(i, j, v) {
             for (let x = 0; x < 9; x++) {
-                if(i  == x) continue;
+                if (i == x) continue;
                 if (sudoku[x][j] == v) return false;
             }
             for (let y = 0; y < 9; y++) {
-                if(j == y) continue;
+                if (j == y) continue;
                 if (sudoku[i][y] == v) return false;
             }
             let xBegin = Math.floor(i / 3) * 3;
             let yBegin = Math.floor(j / 3) * 3;
             for (let x = xBegin; x < xBegin + 3; x++) {
                 for (let y = yBegin; y < yBegin + 3; y++) {
-                    if(i == x && j == y) continue;
+                    if (i == x && j == y) continue;
                     if (sudoku[x][y] == v) return false;
                 }
             }
@@ -288,12 +314,12 @@
             return true;
         }
         //valid한 input인지 확인한다.
-        function checkValidUserInput(){
-            for(let i = 0; i < 9; i ++){
-                for (let j = 0; j < 9; j ++){
-                    if(parseInt(userInput[i][j]) != 0){
+        function checkValidUserInput() {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (parseInt(userInput[i][j]) != 0) {
                         console.log(`${i} ${j} ${userInput[i][j]}`);
-                        if(!checkValid(i,j,userInput[i][j])){
+                        if (!checkValid(i, j, userInput[i][j])) {
                             return false;
                         }
                     }
