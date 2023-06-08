@@ -78,15 +78,13 @@ function toggleFlag(x, y, item) {
     setContext('left-mine', toStringLeadingZero(leftMine, 3));
 }
 function clickTile(e) {
-    let isRightMB = false;
+    let isRightMB = e.button == 2 // right mouse button;
     let item = this;
-    if ("which" in e) { // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-        isRightMB = e.which == 3;
-        for (let i = 0; i < e.path.length; i++) {
-            if (e.path[i].classList.contains("item")) {
-                item = e.path[i];
-                break;
-            }
+    let composedPath = e.composedPath()
+    for (let i = 0; i < composedPath.length; i++) {
+        if (composedPath[i].classList.contains("item")) {
+            item = composedPath[i];
+            break;
         }
     }
 
@@ -317,7 +315,6 @@ function initGame() {
     leftMine = numMine;
     //disalbe showing menu when click right mouse button
     board.oncontextmenu = function (e) {
-        console.log(e);
         clickTile(e);
         return false;
     }
@@ -348,7 +345,6 @@ function initGame() {
     //modal setting
     let modalClose = document.getElementById("modal-close");
     modalClose.addEventListener("click", function () {
-        console.log("close");
         closeModal();
     });
 }
